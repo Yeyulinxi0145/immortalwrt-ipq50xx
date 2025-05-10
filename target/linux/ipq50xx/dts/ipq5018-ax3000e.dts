@@ -1,0 +1,125 @@
+// SPDX-License-Identifier: (GPL-2.0+)
+/dts-v1/;
+
+#include "ipq5018.dtsi"
+
+/ {
+	model = "Xiaomi AX3000E";
+	compatible = "xiaomi,ax3000e", "qcom,ipq5018";
+
+	#address-cells = <2>;
+	#size-cells = <2>;
+	interrupt-parent = <&intc>;
+
+	aliases {
+		serial0 = &blsp1_uart1;
+		ethernet0 = &mac0;
+		ethernet1 = &mac1;
+		led-boot = &led_system_blue;
+		led-failsafe = &led_system_red;
+		led-running = &led_system_blue;
+		led-upgrade = &led_system_red;
+	};
+
+	chosen {
+		bootargs = "ubi.mtd=rootfs root=mtd:ubi_rootfs rootfstype=squashfs cnss2.bdf_integrated=0x23 cnss2.bdf_pci0=0x60 cnss2.bdf_pci1=0x60 cnss2.skip_radio_bmap=4 rootwait";
+		stdout-path = "serial0:115200n8";
+	};
+
+	reserved-memory {
+		q6_mem_regions: q6_mem_regions@4b000000 {
+			no-map;
+#ifndef CONFIG_ATH11K_MEM_PROFILE_256M
+			reg = <0x0 0x4b000000 0x0 0x3b00000>;
+#else
+			reg = <0x0 0x4b000000 0x0 0x3000000>;
+#endif
+		};
+	};
+
+	thermal-zones {
+		status = "ok";
+	};
+
+	&blsp1_uart1 {
+		status = "okay";
+	};
+
+	&mac0 {
+		status = "okay";
+	};
+
+	&mac1 {
+		status = "okay";
+	};
+
+	&tlmm {
+		blsp_uart0_pins: blsp_uart0_pins {
+			pins = "gpio20", "gpio21";
+			function = "blsp0_uart0";
+			drive-strength = <8>;
+			bias-disable;
+		};
+
+		leds_pins: leds_pins {
+			led_system_blue {
+				pins = "gpio24";
+				function = "gpio";
+				drive-strength = <8>;
+				bias-pull-down;
+			};
+
+			led_system_red {
+				pins = "gpio25";
+				function = "gpio";
+				drive-strength = <8>;
+				bias-pull-down;
+			};
+		};
+	};
+
+	&leds {
+		compatible = "gpio-leds";
+		pinctrl-0 = <&leds_pins>;
+		pinctrl-names = "default";
+
+		led_system_blue: led_system_blue {
+			label = "blue:system";
+			gpio = <&tlmm 24 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+		};
+
+		led_system_red: led_system_red {
+			label = "red:system";
+			gpio = <&tlmm 25 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	&nand {
+		status = "okay";
+	};
+
+	&qpic_bam {
+		status = "okay";
+	};
+
+	&tsens {
+		status = "okay";
+	};
+
+	&soc {
+		button {
+			compatible = "gpio-keys";
+			pinctrl-0 = <&button_pins>;
+			pinctrl-names = "default";
+
+			button_reset {
+				label = "reset";
+				gpios = <&tlmm 38 GPIO_ACTIVE_LOW>;
+				linux,input-type = <EV_KEY>;
+				linux,code = <KEY_RESTART>;
+				debounce-interval = <60>;
+			};
+		};
+	};
+};

@@ -93,4 +93,22 @@ define Device/xiaomi_cr881x
 endef
 TARGET_DEVICES += xiaomi_cr881x
 
+define Device/xiaomi_ax3000e
+  $(call Device/FitImage)
+  $(call Device/UbiFit)
+  SOC := ipq5018
+  DEVICE_VENDOR := Xiaomi
+  DEVICE_MODEL := AX3000E
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  DEVICE_DTS_CONFIG := config@mp03.3
+  IMAGES := nand-factory.ubi
+  DEVICE_PACKAGES := \
+	ATH11K_MEM_PROFILE_256M \
+	ath11k-firmware-ipq5018 \
+	ath11k-firmware-qcn6122 \
+	ipq-wifi-xiaomi_ax3000e
+endef
+TARGET_DEVICES += xiaomi_ax3000e
+
 $(eval $(call BuildImage))
